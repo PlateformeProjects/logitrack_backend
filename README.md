@@ -68,7 +68,7 @@ Chaque expédition renvoyée ou manipulée par l'API respecte la structure suiva
 | `POST` | `/api/v1/shipments` | Créer une nouvelle expédition |
 | `PUT` | `/api/v1/shipments/:id` | Mettre à jour une expédition existante |
 | `DELETE` | `/api/v1/shipments/:id` | Supprimer une expédition |
-| `POST` | `/api/v1/reset` | Réinitialiser les données au seed initial (8 expéditions) |
+| `POST` | `/api/v1/reset` | Réinitialiser les données au seed initial (50 expéditions) |
 
 ---
 
@@ -262,7 +262,7 @@ Host: localhost:3000
 
 #### 6. `POST /api/v1/reset`
 
-Réinitialise l'ensemble des expéditions en mémoire aux 8 expéditions par défaut de départ.
+Réinitialise l'ensemble des expéditions en mémoire aux 50 expéditions par défaut de départ.
 
 **Exemple de requête :**
 ```http
@@ -274,7 +274,7 @@ Host: localhost:3000
 ```json
 {
   "success": true,
-  "message": "Les données ont été réinitialisées avec succès aux 8 expéditions initiales.",
-  "total": 8
+  "message": "Les données ont été réinitialisées avec succès aux 50 expéditions initiales.",
+  "total": 50
 }
 ```

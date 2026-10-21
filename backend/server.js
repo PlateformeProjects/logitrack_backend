@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 // -----------------------------------------------------------------------------
-// Données initiales (Seed Data)
+// Générateur de Données (Seed Data réaliste ~ 50 expéditions)
 // -----------------------------------------------------------------------------
 /**
  * @typedef {'DHL' | 'Chronopost' | 'FedEx' | 'UPS'} Carrier
@@ -46,104 +46,100 @@ app.use((req, res, next) => {
  * @property {string} internalNotes - Remarques internes des opérateurs logistiques
  */
 
-const INITIAL_SHIPMENTS = [
-  {
-    id: 'shp-8492',
-    trackingNumber: 'TRK-8492-FR',
-    recipient: 'Camille Laurent',
-    destinationCity: 'Lyon',
-    carrier: 'Chronopost',
-    status: 'IN_TRANSIT',
-    departureDate: '2026-10-19T08:30:00.000Z',
-    estimatedDelivery: '2026-10-22T14:00:00.000Z',
-    isPriority: true,
-    internalNotes: 'Accès digicode bâtiment B - Laisser au gardien si absent.'
-  },
-  {
-    id: 'shp-3120',
-    trackingNumber: 'TRK-3120-FR',
-    recipient: 'Lucas Dubois',
-    destinationCity: 'Marseille',
-    carrier: 'DHL',
-    status: 'DELIVERED',
-    departureDate: '2026-10-17T06:45:00.000Z',
-    estimatedDelivery: '2026-10-20T11:15:00.000Z',
-    isPriority: false,
-    internalNotes: 'Remis en main propre contre signature.'
-  },
-  {
-    id: 'shp-9041',
-    trackingNumber: 'TRK-9041-FR',
-    recipient: 'Amina Mansouri',
-    destinationCity: 'Bordeaux',
-    carrier: 'FedEx',
-    status: 'DELAYED',
-    departureDate: '2026-10-18T10:00:00.000Z',
-    estimatedDelivery: '2026-10-24T18:00:00.000Z',
-    isPriority: true,
-    internalNotes: 'Retard météo sur le hub de transit régional.'
-  },
-  {
-    id: 'shp-5512',
-    trackingNumber: 'TRK-5512-FR',
-    recipient: 'Julien Moreau',
-    destinationCity: 'Lille',
-    carrier: 'UPS',
-    status: 'PENDING',
-    departureDate: '2026-10-21T07:00:00.000Z',
-    estimatedDelivery: '2026-10-23T16:30:00.000Z',
-    isPriority: false,
-    internalNotes: 'Colis en cours d emballage dans l entrepôt nord.'
-  },
-  {
-    id: 'shp-7723',
-    trackingNumber: 'TRK-7723-FR',
-    recipient: 'Sophie Martin',
-    destinationCity: 'Nantes',
-    carrier: 'Chronopost',
-    status: 'IN_TRANSIT',
-    departureDate: '2026-10-20T14:15:00.000Z',
-    estimatedDelivery: '2026-10-22T10:00:00.000Z',
-    isPriority: false,
-    internalNotes: 'Livraison standard en point relais consigne.'
-  },
-  {
-    id: 'shp-6204',
-    trackingNumber: 'TRK-6204-FR',
-    recipient: 'Alexandre Petit',
-    destinationCity: 'Toulouse',
-    carrier: 'DHL',
-    status: 'DELIVERED',
-    departureDate: '2026-10-16T09:20:00.000Z',
-    estimatedDelivery: '2026-10-19T15:45:00.000Z',
-    isPriority: false,
-    internalNotes: 'Déposé dans la boîte aux lettres normalisée.'
-  },
-  {
-    id: 'shp-1845',
-    trackingNumber: 'TRK-1845-FR',
-    recipient: 'Éléonore Faure',
-    destinationCity: 'Strasbourg',
-    carrier: 'FedEx',
-    status: 'DELAYED',
-    departureDate: '2026-10-18T13:00:00.000Z',
-    estimatedDelivery: '2026-10-25T12:00:00.000Z',
-    isPriority: true,
-    internalNotes: 'Contrôle douanier en cours sur le fret frontalier.'
-  },
-  {
-    id: 'shp-4938',
-    trackingNumber: 'TRK-4938-FR',
-    recipient: 'Thomas Bernard',
-    destinationCity: 'Paris',
-    carrier: 'UPS',
-    status: 'IN_TRANSIT',
-    departureDate: '2026-10-21T05:30:00.000Z',
-    estimatedDelivery: '2026-10-22T09:00:00.000Z',
-    isPriority: true,
-    internalNotes: 'Course express 24h - Matériel médical fragile.'
-  }
+const RECIPIENTS = [
+  'Camille Laurent', 'Lucas Dubois', 'Amina Mansouri', 'Julien Moreau',
+  'Sophie Martin', 'Alexandre Petit', 'Éléonore Faure', 'Thomas Bernard',
+  'Yasmine Belkacem', 'Maxime Lefebvre', 'Sarah Connor', 'David Cohen',
+  'Léa Girard', 'Antoine Roux', 'Fatou Diallo', 'Nicolas Bonnet',
+  'Chloé Mercier', 'Hugo Legrand', 'Inès Benali', 'Guillaume François',
+  'Manon Gauthier', 'Romain Perrin', 'Claire Marchand', 'Kevin Roche',
+  'Emma Meyer', 'Arthur Fontaine', 'Julie Chevalier', 'Mehdi Khelil'
 ];
+
+const CITIES = [
+  'Paris', 'Lyon', 'Marseille', 'Toulouse', 'Bordeaux', 'Lille',
+  'Nantes', 'Strasbourg', 'Montpellier', 'Rennes', 'Nice', 'Grenoble',
+  'Rouen', 'Toulon', 'Dijon', 'Angers', 'Brest', 'Le Mans', 'Tours',
+  'Aix-en-Provence', 'Clermont-Ferrand', 'Limoges', 'Amiens', 'Metz'
+];
+
+/** @type {Carrier[]} */
+const CARRIERS = ['Chronopost', 'DHL', 'FedEx', 'UPS'];
+
+/** @type {ShipmentStatus[]} */
+const STATUSES = ['IN_TRANSIT', 'DELIVERED', 'DELAYED', 'PENDING'];
+
+const NOTES = [
+  'Accès digicode bâtiment B - Laisser au gardien si absent.',
+  'Remis en main propre contre signature obligatoire.',
+  'Retard météo sur le hub logistique régional.',
+  'Colis en cours de préparation dans l entrepôt principal.',
+  'Livraison en consigne automatique sécurisée (Locker).',
+  'Déposé dans la boîte aux lettres normalisée.',
+  'Contrôle douanier en cours sur le fret aérien.',
+  'Course express 24h - Matériel médical fragile.',
+  'Appeler 15 minutes avant livraison.',
+  'Deuxième présentation après échec de livraison hier.',
+  'Adresse professionnelle, livraison heures de bureau uniquement.',
+  'Colis volumineux - Prévoir diable de transport.',
+  'Fragile : manipuler avec précaution (bouteilles en verre).',
+  'Signature numérique requise.'
+];
+
+/**
+ * Génère une base de données mémoire réaliste de 50 expéditions.
+ * @returns {Shipment[]}
+ */
+function generateSeedShipments() {
+  const list = [];
+  const now = new Date('2026-10-21T12:00:00.000Z').getTime();
+
+  for (let i = 1; i <= 50; i++) {
+    const id = `shp-${1000 + i}`;
+    const trackingCode = 1000 + Math.floor((i * 137 + 543) % 9000);
+    const trackingNumber = `TRK-${trackingCode}-FR`;
+
+    const recipient = RECIPIENTS[(i * 3 + 7) % RECIPIENTS.length];
+    const destinationCity = CITIES[(i * 5 + 11) % CITIES.length];
+    const carrier = CARRIERS[i % CARRIERS.length];
+    const status = STATUSES[(i * 2 + 1) % STATUSES.length];
+
+    // Calcul des dates échelonnées de manière cohérente
+    const daysBefore = (i % 6) + 1;
+    const departureTime = now - daysBefore * 24 * 60 * 60 * 1000 + (i * 37 % 86400000);
+    const departureDate = new Date(departureTime).toISOString();
+
+    let estimatedTime;
+    if (status === 'DELIVERED') {
+      estimatedTime = departureTime + ((i % 3) + 1) * 24 * 60 * 60 * 1000;
+    } else if (status === 'DELAYED') {
+      estimatedTime = now + ((i % 4) + 3) * 24 * 60 * 60 * 1000;
+    } else {
+      estimatedTime = now + ((i % 3) + 1) * 24 * 60 * 60 * 1000;
+    }
+    const estimatedDelivery = new Date(estimatedTime).toISOString();
+
+    const isPriority = (i % 4 === 0) || (i % 7 === 0);
+    const internalNotes = NOTES[(i * 7) % NOTES.length];
+
+    list.push({
+      id,
+      trackingNumber,
+      recipient,
+      destinationCity,
+      carrier,
+      status,
+      departureDate,
+      estimatedDelivery,
+      isPriority,
+      internalNotes
+    });
+  }
+
+  return list;
+}
+
+const INITIAL_SHIPMENTS = generateSeedShipments();
 
 // État mémoire mutable (réinitialisable via /api/v1/reset)
 let shipments = JSON.parse(JSON.stringify(INITIAL_SHIPMENTS));
@@ -354,13 +350,13 @@ app.delete('/api/v1/shipments/:id', (req, res) => {
 
 /**
  * POST /api/v1/reset
- * Réinitialise l'ensemble des données mémoire au jeu de données initial (8 colis).
+ * Réinitialise l'ensemble des données mémoire au jeu de données initial (50 colis).
  */
 app.post('/api/v1/reset', (req, res) => {
   shipments = JSON.parse(JSON.stringify(INITIAL_SHIPMENTS));
   res.status(200).json({
     success: true,
-    message: 'Les données ont été réinitialisées avec succès aux 8 expéditions initiales.',
+    message: `Les données ont été réinitialisées avec succès aux ${shipments.length} expéditions initiales.`,
     total: shipments.length
   });
 });
@@ -371,6 +367,7 @@ app.post('/api/v1/reset', (req, res) => {
 app.listen(PORT, () => {
   console.log('====================================================');
   console.log(`📦 LogiTrack Backend API opérationnel sur http://localhost:${PORT}`);
+  console.log(`📊 Jeu initial chargé : ${shipments.length} expéditions logistiques`);
   console.log(`📡 Endpoints disponibles :`);
   console.log(`   - GET    http://localhost:${PORT}/api/v1/shipments`);
   console.log(`   - GET    http://localhost:${PORT}/api/v1/shipments/:id`);
